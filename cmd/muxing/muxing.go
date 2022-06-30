@@ -22,11 +22,11 @@ func HelloGet(w http.ResponseWriter, r *http.Request) {
 
 	param, _ := mux.Vars(r)["PARAM"]
 
-	fmt.Fprintf(w, "Hello, %s", param)
-	//if err != nil {
-	//	fmt.Println(err)
-	//	panic(err)
-	//}
+	_, err := fmt.Fprintf(w, "Hello, %s!", param)
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
+	}
 }
 
 func BadGet(w http.ResponseWriter, r *http.Request) {
