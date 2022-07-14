@@ -18,52 +18,48 @@ Feel free to drop gorilla.mux if you want and use any other solution available.
 main function reads host/port from env just for an example, flavor it following your taste
 */
 
+// HelloGet to handle Get with param
 func HelloGet(w http.ResponseWriter, r *http.Request) {
 
+	// read param from request
 	param, _ := mux.Vars(r)["PARAM"]
 
 	_, err := fmt.Fprintf(w, "Hello, %s!", param)
 	if err != nil {
 		fmt.Println(err)
-		panic(err)
+		panic(err) // panic just for fun!)
 	}
+	w.WriteHeader(http.StatusOK)
+
 }
 
+// BadGet to handle Get with status 500
 func BadGet(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusInternalServerError)
-	//w.Header().Set("Content-Type", "application/json")
-	//resp := make(map[string]string)
-	//resp["message"] = "Some Error Occurred"
-	//jsonResp, err := json.Marshal(resp)
-	//if err != nil {
-	//	log.Fatalf("Error happened in JSON marshal. Err: %s", err)
-	//}
-	//w.Write(jsonResp)
 	return
 }
 
+// BodyPost to handle Post with data and param
 func BodyPost(w http.ResponseWriter, r *http.Request) {
-	//param, _ := mux.Vars(r)["PARAM"]
 	d, err := io.ReadAll(r.Body)
 	if err != nil {
 		fmt.Println("error reading data")
 	}
 	data := []byte(fmt.Sprintf("I got message:\n%s", d))
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 	w.Write(data)
 }
 
+// HeadersPost to handle Post with params in header
 func HeadersPost(w http.ResponseWriter, r *http.Request) {
+	// read "a" and "b" from header
 	a, b := r.Header.Get("a"), r.Header.Get("b")
-	for k, v := range r.Header {
-		fmt.Println(k)
-		fmt.Println(v)
-	}
-	fmt.Print("aaa")
-	fmt.Println(a)
+
+	// convert them to string
 	aInt, _ := strconv.Atoi(a)
 	bInt, _ := strconv.Atoi(b)
+
+	// write sum to header
 	w.Header().Set("a+b", strconv.Itoa(aInt+bInt))
 	w.WriteHeader(http.StatusOK)
 }
@@ -72,6 +68,7 @@ func HeadersPost(w http.ResponseWriter, r *http.Request) {
 func Start(host string, port int) {
 	router := mux.NewRouter()
 
+	// create handlers
 	router.HandleFunc("/name/{PARAM}", HelloGet).Methods(http.MethodGet)
 	router.HandleFunc("/bad", BadGet).Methods(http.MethodGet)
 	router.HandleFunc("/data", BodyPost).Methods(http.MethodPost)
